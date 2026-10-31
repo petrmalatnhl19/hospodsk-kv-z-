@@ -1,0 +1,461 @@
+
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hospodský kvíz | Dlouhá Lhota</title>
+<style>
+:root{
+  --bg:#070d1b;--panel:#101b30;--panel2:#172641;
+  --gold:#f5c45e;--cyan:#56e4f5;--white:#f4f7ff;
+  --muted:#91a2bd;--line:#2a3b58;--green:#62e6a4;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:radial-gradient(ellipse at 50% -20%,#1c365b 0%,#0a1325 48%,#050914 100%);
+  color:var(--white);font-family:Arial,Helvetica,sans-serif;min-height:100vh;
+}
+button,input{font:inherit}
+button{
+  border:1px solid #405577;background:linear-gradient(135deg,#1c3151,#12213a);
+  color:white;padding:11px 16px;border-radius:10px;cursor:pointer;
+  transition:.2s;font-weight:700;
+}
+button:hover{border-color:var(--cyan);transform:translateY(-1px);box-shadow:0 0 18px #56e4f533}
+button.primary{background:linear-gradient(135deg,#e8b94e,#a87924);color:#101522;border:0}
+button.danger{border-color:#a64c5a;color:#ff9aa7}
+button.active{border-color:var(--gold);color:var(--gold)}
+input{
+  background:#081326;color:white;border:1px solid #344967;
+  padding:11px;border-radius:9px;min-width:0;width:100%;
+}
+header{
+  padding:22px 5%;border-bottom:1px solid #ffffff18;
+  display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;
+  background:#071020cc;backdrop-filter:blur(12px);
+}
+.brand{display:flex;align-items:center;gap:13px}
+.logo{
+  width:53px;height:53px;border:2px solid var(--gold);border-radius:50%;
+  display:grid;place-items:center;color:var(--gold);font-size:27px;
+  box-shadow:0 0 20px #f5c45e55,inset 0 0 15px #f5c45e22;
+}
+h1{font-size:clamp(19px,3vw,27px);margin:0;letter-spacing:2px}
+.subtitle{color:var(--muted);font-size:11px;letter-spacing:4px;margin-top:5px}
+main{max-width:1450px;margin:auto;padding:25px 4% 60px}
+h2{font-size:20px;margin:0 0 17px}
+h3{margin:0 0 12px}
+.muted{color:var(--muted)}
+.panel{
+  background:linear-gradient(145deg,#14223aee,#0d1729ee);
+  border:1px solid var(--line);border-radius:17px;padding:20px;
+  box-shadow:0 12px 35px #0004;
+}
+.grid{display:grid;grid-template-columns:1.05fr 1.6fr;gap:18px}
+.stack{display:grid;gap:18px}
+.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.row>*{flex:1}
+.section-title{
+  color:var(--gold);font-size:12px;letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:13px;font-weight:bold;
+}
+.rounds{display:grid;gap:8px}
+.round-btn{text-align:left;display:flex;justify-content:space-between;align-items:center}
+.round-btn small{color:var(--muted)}
+.question-number{color:var(--cyan);font-size:12px;letter-spacing:2px}
+.question-text{
+  font-size:clamp(23px,3.2vw,39px);line-height:1.25;font-weight:800;
+  margin:18px 0 22px;
+}
+.answer{
+  border:1px solid #62e6a466;background:#62e6a410;color:var(--green);
+  border-radius:12px;padding:15px;font-size:20px;font-weight:bold;
+}
+.hidden{display:none!important}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.option{padding:14px;background:#0a1528;border:1px solid #304361;border-radius:10px}
+.option b{color:var(--gold);margin-right:8px}
+.timer{
+  font-size:42px;font-weight:900;color:var(--gold);
+  text-shadow:0 0 20px #f5c45e55;font-variant-numeric:tabular-nums;
+}
+.timer.warning{color:#ff6e7b}
+.progress{height:6px;background:#24334b;border-radius:10px;overflow:hidden;margin:12px 0}
+.progress>div{height:100%;background:linear-gradient(90deg,var(--cyan),var(--gold));width:0%;transition:.3s}
+.team-list{display:grid;gap:8px}
+.team-row{
+  display:grid;grid-template-columns:1fr 85px 35px;gap:8px;align-items:center;
+  background:#0a1528;padding:8px 10px;border-radius:9px;
+}
+.team-row input{padding:8px}
+.score-row{
+  display:grid;grid-template-columns:1fr 100px;gap:10px;align-items:center;
+  padding:9px 0;border-bottom:1px solid #ffffff12;
+}
+.score-row:last-child{border:0}
+.score-row input{max-width:100px}
+.leaderboard{display:grid;gap:8px}
+.leader{
+  display:grid;grid-template-columns:35px 1fr 60px;align-items:center;gap:10px;
+  background:#0a1528;border:1px solid #263a57;border-radius:10px;padding:12px;
+}
+.rank{font-size:20px;color:var(--gold);font-weight:900}
+.points{text-align:right;color:var(--cyan);font-weight:900;font-size:20px}
+.footer{text-align:center;color:#657894;font-size:11px;margin-top:30px;letter-spacing:2px}
+#projection{min-height:100vh;padding:4vw;display:flex;flex-direction:column}
+#projection .project-head{display:flex;justify-content:space-between;align-items:center;gap:20px}
+#projection .project-logo{font-size:clamp(25px,4vw,48px);color:var(--gold);font-weight:900;letter-spacing:4px}
+#projection .project-sub{color:var(--cyan);letter-spacing:5px;font-size:12px;margin-top:8px}
+#projection .project-main{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1200px;width:100%;margin:auto}
+#projection .project-question{font-size:clamp(30px,5vw,68px);line-height:1.16;font-weight:900;margin:25px 0}
+#projection .project-options{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+#projection .project-option{font-size:clamp(19px,2.4vw,30px);padding:20px;border:1px solid #344c70;border-radius:14px;background:#10203a}
+#projection .project-option b{color:var(--gold);margin-right:12px}
+#projection .project-answer{font-size:clamp(24px,3.5vw,44px);color:var(--green);font-weight:bold;border:1px solid #62e6a466;background:#62e6a410;padding:22px;border-radius:14px}
+#projection .project-bottom{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px}
+#projection .project-timer{font-size:clamp(35px,5vw,65px);color:var(--gold);font-weight:900}
+#projection .project-board{max-width:900px;width:100%;margin:auto}
+#projection .project-board .leader{padding:18px;font-size:clamp(18px,2.5vw,28px)}
+#projection .project-board .points{font-size:clamp(20px,3vw,34px)}
+@media(max-width:800px){
+ .grid{grid-template-columns:1fr}
+ .options,#projection .project-options{grid-template-columns:1fr}
+ header{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<div id="admin">
+<header>
+  <div class="brand">
+    <div class="logo">★</div>
+    <div>
+      <h1>HOSPODSKÝ KVÍZ</h1>
+      <div class="subtitle">DLOUHÁ LHOTA · KVÍZOVÝ VEČER</div>
+    </div>
+  </div>
+  <div class="row" style="flex:0 1 auto">
+    <button onclick="openProjection()">↗ Otevřít projekci</button>
+    <button onclick="resetGame()" class="danger">Nová soutěž</button>
+  </div>
+</header>
+
+<main>
+  <div class="grid">
+    <div class="stack">
+      <section class="panel">
+        <div class="section-title">01 / Týmy</div>
+        <div class="row">
+          <input id="newTeam" placeholder="Název nového týmu" maxlength="28">
+          <button class="primary" onclick="addTeam()">+ Přidat</button>
+        </div>
+        <div class="team-list" id="teamList" style="margin-top:14px"></div>
+        <p class="muted" style="font-size:12px">Doporučení: 2–5 hráčů v týmu, ideálně 6–8 týmů.</p>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">02 / Soutěžní kola</div>
+        <div class="rounds" id="roundList"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">03 / Průběžné pořadí</div>
+        <div class="leaderboard" id="adminBoard"></div>
+      </section>
+    </div>
+
+    <div class="stack">
+      <section class="panel">
+        <div class="row" style="justify-content:space-between">
+          <div>
+            <div class="section-title">04 / Moderátorský pult</div>
+            <h2 id="roundHeading">Všeobecný přehled</h2>
+          </div>
+          <div style="text-align:right">
+            <div class="question-number" id="questionNumber">OTÁZKA 1 / 8</div>
+            <div class="timer" id="timer">00:30</div>
+          </div>
+        </div>
+        <div class="progress"><div id="progressBar"></div></div>
+        <div class="question-text" id="questionText"></div>
+        <div class="options" id="options"></div>
+        <div class="answer hidden" id="answer"></div>
+        <div class="row" style="margin-top:20px">
+          <button onclick="previousQuestion()">← Předchozí</button>
+          <button onclick="toggleTimer()" id="timerButton" class="primary">▶ Spustit čas</button>
+          <button onclick="revealAnswer()" id="revealButton">Odhalit odpověď</button>
+          <button onclick="nextQuestion()">Další →</button>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button onclick="stopTimer()">■ Zastavit čas</button>
+          <button onclick="resetTimer()">↻ Reset 30 s</button>
+          <button onclick="showBoard()">Zobrazit pořadí</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">05 / Bodování aktuálního kola</div>
+        <p class="muted" style="font-size:13px">Po vyhodnocení papírových archů zadej body jednotlivým týmům.</p>
+        <div id="scoreInputs"></div>
+      </section>
+    </div>
+  </div>
+  <div class="footer">DLOUHÁ LHOTA · KVÍZOVÁ SHOW · OFFLINE EDITION</div>
+</main>
+</div>
+
+<div id="projection" class="hidden">
+  <div class="project-head">
+    <div>
+      <div class="project-logo">★ DLOUHÁ LHOTA</div>
+      <div class="project-sub">HOSPODSKÝ KVÍZ</div>
+    </div>
+    <div class="project-timer" id="pTimer">00:30</div>
+  </div>
+  <div class="project-main" id="projectMain">
+    <div class="question-number" id="pRound">1. KOLO</div>
+    <div class="project-question" id="pQuestion">Vítejte na kvízu!</div>
+    <div class="project-options" id="pOptions"></div>
+    <div class="project-answer hidden" id="pAnswer"></div>
+  </div>
+  <div class="project-bottom">
+    <span id="pCounter">PŘIPRAVTE SE</span>
+    <span>DLOUHÁ LHOTA · 2026</span>
+  </div>
+</div>
+
+<script>
+const rounds = [
+ {name:"Všeobecný přehled",questions:[
+  ["Kolik kontinentů se běžně uvádí na Zemi?",["5","6","7","8"],"7"],
+  ["Jaké je hlavní město Austrálie?",["Sydney","Canberra","Melbourne","Perth"],"Canberra"],
+  ["Kolik stran má šestiúhelník?",["5","6","7","8"],"6"],
+  ["Která planeta je nejblíže Slunci?",["Venuše","Mars","Merkur","Země"],"Merkur"],
+  ["Jak se jmenuje největší oceán?",["Atlantský","Indický","Arktický","Tichý"],"Tichý oceán"],
+  ["Kolik minut trvá jedna třetina hodiny?",["15","18","20","25"],"20"],
+  ["Které zvíře je symbolem WWF?",["Tygr","Panda","Slon","Medvěd"],"Panda"],
+  ["Který kov má chemickou značku Fe?",["Měď","Zlato","Železo","Stříbro"],"Železo"]
+ ]},
+ {name:"Hudební hádanky",questions:[
+  ["Která česká kapela nazpívala hit Jožin z bažin?",["Kabát","Banjo Band Ivana Mládka","Chinaski","Olympic"],"Banjo Band Ivana Mládka"],
+  ["Který zpěvák je známý jako Král popu?",["Elvis Presley","Freddie Mercury","Michael Jackson","Prince"],"Michael Jackson"],
+  ["Jak se jmenuje slavná britská skupina, která vydala album Abbey Road?",["Queen","The Beatles","The Rolling Stones","Oasis"],"The Beatles"],
+  ["Kdo zpívá píseň Včelka Mája v české verzi?",["Karel Gott","Waldemar Matuška","Michal David","Petr Novák"],"Karel Gott"],
+  ["Který nástroj má obvykle 88 kláves?",["Kytara","Klavír","Akordeon","Varhany"],"Klavír"],
+  ["Ze které země pochází skupina ABBA?",["Norsko","Dánsko","Švédsko","Finsko"],"Švédsko"],
+  ["Který český zpěvák nazpíval píseň Trezor?",["Karel Gott","Marek Ztracený","Václav Neckář","Petr Janda"],"Karel Gott"],
+  ["Jak se nazývá člověk, který řídí orchestr?",["Producent","Dirigent","Skladatel","Sólista"],"Dirigent"]
+ ]},
+ {name:"Česko a okolí",questions:[
+  ["Která řeka protéká Prahou?",["Labe","Morava","Vltava","Ohře"],"Vltava"],
+  ["Jak se jmenuje nejvyšší hora České republiky?",["Praděd","Sněžka","Lysá hora","Kleť"],"Sněžka"],
+  ["Ve kterém kraji leží Tábor?",["Plzeňském","Jihočeském","Vysočina","Středočeském"],"Jihočeském"],
+  ["Které město je známé výrobou automobilů Škoda?",["Mladá Boleslav","Kvasiny","Kolín","Tábor"],"Mladá Boleslav"],
+  ["Kdo byl prvním československým prezidentem?",["Edvard Beneš","Václav Havel","Tomáš G. Masaryk","Milan Rastislav Štefánik"],"Tomáš G. Masaryk"],
+  ["Který hrad je spojován s Karlem IV. a korunovačními klenoty?",["Karlštejn","Křivoklát","Loket","Hluboká"],"Karlštejn"],
+  ["Jak se jmenuje jihočeský rybník u Třeboně, jeden z největších v ČR?",["Rožmberk","Svět","Bezdrev","Dvořiště"],"Rožmberk"],
+  ["Které město leží nejblíže Dlouhé Lhotě u Tábora?",["Tábor","České Budějovice","Písek","Jindřichův Hradec"],"Tábor"]
+ ]},
+ {name:"Obrázková poznávačka",questions:[
+  ["🐝 + 🍯 Co vzniká díky práci včel?",["Mléko","Med","Sirup","Olej"],"Med"],
+  ["🗼 Ve kterém městě stojí tato slavná věž?",["Řím","Paříž","Londýn","Madrid"],"Paříž – Eiffelova věž"],
+  ["🦔 Jaké zvíře se při nebezpečí stočí do klubíčka?",["Ježek","Veverka","Krtek","Kuna"],"Ježek"],
+  ["🍕 Která země je domovem pizzy?",["Řecko","Španělsko","Itálie","Francie"],"Itálie"],
+  ["🚂 Jak se nazývá člověk, který řídí vlak?",["Strojvedoucí","Výpravčí","Průvodčí","Dispečer"],"Strojvedoucí"],
+  ["🌻 Která rostlina se otáčí za Sluncem?",["Tulipán","Slunečnice","Růže","Levandule"],"Slunečnice"],
+  ["🐸 Jak se nazývá mládě žáby?",["Pulík","Pulec","Žabák","Larva"],"Pulec"],
+  ["🏰 Jak se nazývá sídlo krále nebo šlechtice?",["Mlýn","Hrad","Maják","Pevnost"],"Hrad"]
+ ]},
+ {name:"Tipovačky a překvapení",questions:[
+  ["Kolik kostek je potřeba na složení klasické Rubikovy kostky 3×3?",["20","26","27","30"],"26 viditelných a pohyblivých dílků"],
+  ["Kolik dní má přestupný rok?",["364","365","366","367"],"366"],
+  ["Kolik nohou má dohromady 5 pavouků?",["20","30","40","50"],"40"],
+  ["Kolik hráčů jednoho týmu je současně na hřišti při fotbale?",["9","10","11","12"],"11"],
+  ["Jaký je přibližný obvod Země na rovníku?",["10 000 km","20 000 km","30 000 km","40 000 km"],"40 000 km"],
+  ["Kolik barev má olympijských kruhů?",["4","5","6","7"],"5"],
+  ["Kolik měsíců v roce má alespoň 28 dní?",["1","2","6","12"],"12"],
+  ["Kolik je 15 × 4 − 10?",["40","45","50","60"],"50"]
+ ]}
+];
+
+const channel = ("BroadcastChannel" in window) ? new BroadcastChannel("dlouha-lhota-kviz") : null;
+let state = {
+ teams:[],round:0,question:0,seconds:30,running:false,revealed:false,
+ board:false,scores:{}
+};
+let timerInterval=null;
+const $=id=>document.getElementById(id);
+const isScreen=new URLSearchParams(location.search).has("screen");
+
+function save(){
+ localStorage.setItem("dlh-kviz-state",JSON.stringify(state));
+ if(channel)channel.postMessage(state);
+}
+function load(){
+ try{
+  const old=JSON.parse(localStorage.getItem("dlh-kviz-state"));
+  if(old)state={...state,...old};
+ }catch(e){}
+}
+function current(){return rounds[state.round].questions[state.question]}
+function total(team){
+ return Object.values(state.scores[team]||{}).reduce((a,b)=>a+(Number(b)||0),0);
+}
+function addTeam(){
+ const name=$("newTeam").value.trim();
+ if(!name)return;
+ if(state.teams.includes(name)){alert("Tým s tímto názvem už existuje.");return}
+ state.teams.push(name);$("newTeam").value="";save();render();
+}
+function removeTeam(name){
+ if(!confirm("Opravdu odstranit tým "+name+"?"))return;
+ state.teams=state.teams.filter(t=>t!==name);
+ delete state.scores[name];save();render();
+}
+function setRound(i){
+ state.round=i;state.question=0;state.seconds=30;state.running=false;state.revealed=false;state.board=false;
+ stopTimer();save();render();
+}
+function nextQuestion(){
+ if(state.question<rounds[state.round].questions.length-1)state.question++;
+ else if(state.round<rounds.length-1){
+  if(confirm("Kolo je dokončeno. Přejít na další kolo?"))setRound(state.round+1);
+  return;
+ }else{showBoard();return}
+ state.seconds=30;state.running=false;state.revealed=false;stopTimer();save();render();
+}
+function previousQuestion(){
+ if(state.question>0){state.question--;state.seconds=30;state.running=false;state.revealed=false;stopTimer();save();render()}
+}
+function revealAnswer(){state.revealed=true;state.running=false;stopTimer();save();render()}
+function toggleTimer(){
+ if(state.running){state.running=false;stopTimer();save();render();return}
+ if(state.seconds<=0)state.seconds=30;
+ state.running=true;save();render();
+ timerInterval=setInterval(()=>{
+  if(state.seconds>0)state.seconds--;
+  if(state.seconds<=0){state.seconds=0;state.running=false;stopTimer()}
+  save();renderTimer();
+ },1000);
+}
+function stopTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null}}
+function resetTimer(){stopTimer();state.running=false;state.seconds=30;save();render()}
+function renderTimer(){
+ const val="00:"+String(state.seconds).padStart(2,"0");
+ if($("timer")){$("timer").textContent=val;$("timer").classList.toggle("warning",state.seconds<=10)}
+}
+function updateScore(team,value){
+ if(!state.scores[team])state.scores[team]={};
+ state.scores[team][state.round]=Math.max(0,Number(value)||0);
+ save();renderBoards();
+}
+function renderTeams(){
+ $("teamList").innerHTML=state.teams.map(t=>`
+  <div class="team-row">
+   <strong>${escapeHtml(t)}</strong>
+   <span style="color:var(--cyan);text-align:right">${total(t)} b.</span>
+   <button class="danger" onclick="removeTeam('${escapeJs(t)}')" title="Odstranit">×</button>
+  </div>`).join("")||'<p class="muted">Zatím nejsou přidány žádné týmy.</p>';
+}
+function renderRounds(){
+ $("roundList").innerHTML=rounds.map((r,i)=>`
+  <button class="round-btn ${state.round===i?"active":""}" onclick="setRound(${i})">
+   <span>${String(i+1).padStart(2,"0")} · ${r.name}</span><small>${r.questions.length} otázek</small>
+  </button>`).join("");
+}
+function renderQuestion(){
+ const q=current();
+ $("roundHeading").textContent=rounds[state.round].name;
+ $("questionNumber").textContent=`OTÁZKA ${state.question+1} / ${rounds[state.round].questions.length}`;
+ $("questionText").textContent=q[0];
+ $("options").innerHTML=q[1].map((o,i)=>`<div class="option"><b>${"ABCD"[i]}.</b>${escapeHtml(o)}</div>`).join("");
+ $("answer").textContent="✓ SPRÁVNÁ ODPOVĚĎ: "+q[2];
+ $("answer").classList.toggle("hidden",!state.revealed);
+ $("revealButton").textContent=state.revealed?"Odpověď odhalena":"Odhalit odpověď";
+ $("timerButton").textContent=state.running?"Ⅱ Pozastavit":"▶ Spustit čas";
+ $("progressBar").style.width=((state.question+1)/rounds[state.round].questions.length*100)+"%";
+ renderTimer();
+}
+function renderScores(){
+ $("scoreInputs").innerHTML=state.teams.map(t=>`
+  <div class="score-row">
+   <strong>${escapeHtml(t)}</strong>
+   <input type="number" min="0" max="100" value="${state.scores[t]?.[state.round]||0}"
+    onchange="updateScore('${escapeJs(t)}',this.value)" aria-label="Body týmu ${escapeHtml(t)}">
+  </div>`).join("")||'<p class="muted">Nejdříve přidej týmy.</p>';
+}
+function sortedTeams(){return [...state.teams].sort((a,b)=>total(b)-total(a))}
+function boardHTML(){
+ return sortedTeams().map((t,i)=>`
+  <div class="leader">
+   <div class="rank">${i+1}.</div><strong>${escapeHtml(t)}</strong>
+   <div class="points">${total(t)} b.</div>
+  </div>`).join("")||'<p class="muted">Pořadí se zobrazí po přidání týmů.</p>';
+}
+function renderBoards(){
+ $("adminBoard").innerHTML=boardHTML();
+}
+function render(){
+ if(isScreen){renderProjection();return}
+ renderTeams();renderRounds();renderQuestion();renderScores();renderBoards();
+}
+function showBoard(){
+ state.board=true;state.running=false;stopTimer();save();renderProjection();
+ if(!isScreen)alert("Pořadí týmů je připravené k zobrazení na projekci.");
+}
+function openProjection(){
+ const w=window.open(location.href.split("?")[0]+"?screen=1","KvizovaProjekce","width=1200,height=800");
+ if(!w)alert("Prohlížeč zablokoval nové okno. Povol vyskakovací okna pro tento soubor.");
+}
+function renderProjection(){
+ $("admin").classList.add("hidden");$("projection").classList.remove("hidden");
+ const q=current();
+ $("pTimer").textContent="00:"+String(state.seconds).padStart(2,"0");
+ $("pTimer").style.color=state.seconds<=10?"#ff6e7b":"var(--gold)";
+ $("pRound").textContent=`${state.round+1}. KOLO · ${rounds[state.round].name.toUpperCase()}`;
+ $("pCounter").textContent=`OTÁZKA ${state.question+1} / ${rounds[state.round].questions.length}`;
+ if(state.board){
+  $("pRound").textContent="PRŮBĚŽNÉ POŘADÍ";
+  $("projectMain").innerHTML=`<div class="project-board"><div class="project-question" style="text-align:center">🏆 VÝSLEDKY KVÍZU</div><div class="leaderboard">${boardHTML()}</div></div>`;
+ }else{
+  $("projectMain").innerHTML=`
+   <div class="question-number" id="pRound">${state.round+1}. KOLO · ${rounds[state.round].name.toUpperCase()}</div>
+   <div class="project-question">${escapeHtml(q[0])}</div>
+   <div class="project-options">${q[1].map((o,i)=>`<div class="project-option"><b>${"ABCD"[i]}.</b>${escapeHtml(o)}</div>`).join("")}</div>
+   <div class="project-answer ${state.revealed?"":"hidden"}">✓ ${escapeHtml(q[2])}</div>`;
+ }
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function escapeJs(s){return String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'")}
+function resetGame(){
+ if(!confirm("Začít úplně novou soutěž? Týmy a body se vymažou."))return;
+ stopTimer();
+ state={teams:[],round:0,question:0,seconds:30,running:false,revealed:false,board:false,scores:{}};
+ save();render();
+}
+document.addEventListener("keydown",e=>{
+ if(isScreen)return;
+ if(e.target.tagName==="INPUT")return;
+ if(e.code==="ArrowRight"||e.code==="Space"){e.preventDefault();nextQuestion()}
+ if(e.code==="ArrowLeft")previousQuestion();
+ if(e.key.toLowerCase()==="r")revealAnswer();
+ if(e.key.toLowerCase()==="p")toggleTimer();
+ if(e.key.toLowerCase()==="b")showBoard();
+ if(e.key==="Escape"){state.board=false;save();render()}
+});
+if(channel){
+ channel.onmessage=e=>{
+  if(isScreen){state=e.data;renderProjection()}
+ };
+}
+if(isScreen){
+ load();renderProjection();
+ document.addEventListener("keydown",e=>{if(e.key==="f"||e.key==="F")document.documentElement.requestFullscreen?.()});
+}else{
+ load();render();
+}
+</script>
+</body>
+</html>
